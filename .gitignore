@@ -554,6 +554,6 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-rust-src/core/*.h
-rust-src/core/libcore
+FableRustRaytracerNet6iOS/rust-src/core/*.h
+FableRustRaytracerNet6iOS/rust-src/core/libcore
 
