@@ -27,3 +27,6 @@ dotnet run
 * Creates animated images in parallel using F# Async
 * Uses DLL import with Rust static lib
 * Uses Rust from F# !
+
+## Preview
+![gif](https://github.com/delneg/fable-raytracer-ios-net6/blob/master/assets/raytracer_ios.gif?raw=true)
