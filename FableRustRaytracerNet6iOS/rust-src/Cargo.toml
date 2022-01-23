@@ -1,0 +1,24 @@
+#cargo-features = ["strip"]
+
+[package]
+name = "rust-src"
+version = "0.0.1"
+edition = "2021"
+
+[lib]
+name = "core"
+crate-type = ["cdylib", "staticlib"]
+
+[dependencies]
+fable_library_rust = { path = "./build_fable/fable-library-rust" }
+hex = "0.4.3"
+
+
+
+[profile.release]
+# strip = true  # Automatically strip symbols from the binary.
+opt-level = "z"  # Optimize for size.
+lto = true
+# panic = 'abort'
+# TODO: uncomment for real release build
+#codegen-units = 1
