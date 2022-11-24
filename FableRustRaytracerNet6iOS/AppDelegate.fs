@@ -1,11 +1,16 @@
 ﻿namespace FableRustRaytracerNet6iOS
 
 open System
+open System.Diagnostics
 open System.Runtime.InteropServices
 open CoreGraphics
 open UIKit
 open Foundation
 
+module Managed =
+    let addValues (x:int) (y:int) =
+        // printfn "Passed value1: %i, value2: %i" x y
+        x + y
 
 module Native =
     let [<Literal>] DllName = "__Internal"
@@ -57,15 +62,20 @@ type MyViewController() =
         animationView.Frame <- CGRect(0., 512., 128., 128.)
         let tasks = ResizeArray()
         printfn "Creating animation images in parallel..."
-        for degrees = 720 downto 0 do
+        for degrees = 360 downto 0 do
               tasks.Add(renderAnimatedImage (float degrees))
-              
-        let images = Async.Parallel(tasks) |> Async.RunSynchronously
+        async {
+            let! images = Async.Parallel(tasks)
+            printfn $"Finished, created {images.Length} images"
+            NSRunLoop.Main.InvokeOnMainThread(fun _ ->
+                animationView.AnimationImages <- images
+                animationView.StartAnimating()
+            )
+        } |> Async.Start
         
-        printfn $"Finished, created {images.Length} images"
-        animationView.AnimationImages <- images
+        
         this.View.AddSubview(animationView)
-        animationView.StartAnimating()
+        
     
 [<Register(nameof AppDelegate)>]
 type AppDelegate() =
@@ -74,7 +84,23 @@ type AppDelegate() =
     override val Window = null with get, set
 
     override this.FinishedLaunching(_, _) =
-        printfn $" Native add_values: 5 + 6 = {Native.add_values(nativeint 5,nativeint 6)}"
+        
+        let sw = Stopwatch()
+        sw.Start()
+        let resNative = Native.add_values(nativeint 5,nativeint 6)
+        sw.Stop()
+        let nativeTime = sw.Elapsed.TotalMilliseconds
+        
+        let sw = Stopwatch()
+        sw.Start()
+        let resManaged = Managed.addValues 5 6
+        sw.Stop()
+        let managedTime = sw.Elapsed.TotalMilliseconds
+        assert (resNative = resManaged)
+        
+        printfn $"Native took: {nativeTime}ms, managed took: {managedTime}ms, overhead is {managedTime - nativeTime}ms"
+        
+        
         this.Window <- new UIWindow(UIScreen.MainScreen.Bounds)
         let vc = new MyViewController()
         this.Window.RootViewController <- vc

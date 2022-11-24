@@ -27,6 +27,6 @@ pub unsafe extern "C" fn add_values(
     value1: i32,
     value2: i32,
 ) -> i32 {
-    println!("Passed value1: {}, value2: {}", value1, value2);
+    // println!("Passed value1: {}, value2: {}", value1, value2);
     value1 + value2
 }
